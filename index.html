@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Play — Free Demo</title>
+<style>
+:root{--ink:#172033;--muted:#718096;--line:#e8edf4;--bg:#f5f7fb;--blue:#4169e1;--green:#19a66a;--red:#e64b5d;--violet:#8655d8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line);padding:16px 5%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:21px;font-weight:800;color:var(--blue)}.tag{font-size:12px;color:var(--muted);background:#f0f3fa;padding:7px 10px;border-radius:20px}
+main{max-width:1000px;margin:24px auto;padding:0 16px}.notice{background:#fff8e8;border:1px solid #f4dfaa;color:#795b16;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 20px #243b5308}
+h2{font-size:18px;margin:0 0 16px}.timerbox{text-align:center;background:#f7f9ff;border-radius:14px;padding:18px;margin-bottom:18px}
+.small{font-size:12px;color:var(--muted)}.timer{font-size:38px;font-weight:800;color:var(--blue);margin:7px 0}.round{font-size:13px;color:var(--muted)}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.choice{border:0;border-radius:12px;padding:17px 8px;color:white;font-weight:700;font-size:16px;cursor:pointer;opacity:.9;transition:.15s}.choice:focus,.choice.selected{outline:3px solid #202b4530;outline-offset:2px;opacity:1;transform:translateY(-2px)}.red{background:var(--red)}.green{background:var(--green)}.violet{background:var(--violet)}
+button:disabled{opacity:.45;cursor:not-allowed}.status{margin-top:14px;padding:12px;border-radius:10px;background:#f5f7fb;font-size:14px;min-height:44px}
+.score{font-size:30px;font-weight:800;color:var(--blue)}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f7f9fc;padding:13px;border-radius:12px}.stat b{display:block;font-size:20px;margin-top:5px}
+.history{display:flex;flex-direction:column;gap:9px}.historyrow{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:8px 0;font-size:13px}.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px}
+.auth{display:flex;gap:8px;flex-wrap:wrap}.auth input{min-width:0;flex:1;padding:11px;border:1px solid var(--line);border-radius:9px}.btn{border:0;border-radius:9px;background:var(--blue);color:white;padding:11px 14px;font-weight:700;cursor:pointer}.btn.secondary{background:#edf1fb;color:#33446d}
+#authMsg{font-size:12px;color:var(--muted);margin-top:9px}.foot{text-align:center;color:var(--muted);font-size:12px;margin:22px 0}
+@media(max-width:720px){.grid{grid-template-columns:1fr}header{padding:14px 16px}.card{padding:16px}.choices{gap:7px}.choice{font-size:14px;padding:15px 5px}}
+</style>
+</head>
+<body>
+<header><div class="brand">● COLOR PLAY</div><div class="tag">FREE DEMO •  CASH</div></header>
+<main>
+<div class="notice"><b>Demo game:</b> । पैसे की बाज़ी, जमा, निकासीैं। सही अनुमान पर केवल आपका स्कोर बढ़ता है।</div>
+<section class="grid">
+<div class="card">
+<h2>रंग चुनें</h2>
+<div class="timerbox"><div class="small">अगला राउंड शुरू होने में</div><div class="timer" id="timer">30</div><div class="round" id="roundLabel">Round #1</div></div>
+<div class="choices">
+<button class="choice red" data-color="Red">RED</button>
+<button class="choice green" data-color="Green">GREEN</button>
+<button class="choice violet" data-color="Violet">VIOLET</button>
+</div>
+<div class="status" id="status" aria-live="polite">राउंड खत्म होने से पहले एक रंग चुनें।</div>
+<p class="small" style="margin:12px 0 0">हर राउंड का परिणाम डेमो के लिए रैंडम चुना जाता है। कोई पॉइंट खर्च नहीं होता।</p>
+</div>
+<div class="card">
+<h2>आपका स्कोर</h2>
+<div class="stats">
+<div class="stat"><span class="small">कुल सही अनुमान</span><b id="correct">0</b></div>
+<div class="stat"><span class="small">कुल राउंड</span><b id="played">0</b></div>
+</div>
+<div style="margin-top:16px"><div class="small">सही अनुमान का प्रतिशत</div><div class="score" id="accuracy">0%</div></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+<h2>हाल के परिणाम</h2><div class="history" id="history"><div class="small">अभी कोई राउंड पूरा नहीं हुआ।</div></div>
+</div>
+</section>
+<section class="card" style="margin-top:18px">
+<h2>खाता (वैकल्पिक)</h2>
+<p class="small">ईमेल से साइन अप या लॉगिन करके अपना डेमो स्कोर इस Firebase प्रोजेक्ट में सेव कर सकते हैं। पासवर्ड Firebase Authentication संभालता है।</p>
+<div class="auth"><input id="email" type="email" placeholder="Email address" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button class="btn" id="signup">Sign up</button><button class="btn secondary" id="login">Login</button><button class="btn secondary" id="logout" style="display:none">Logout</button></div>
+<div id="authMsg">आप अभी guest mode में हैं।</div>
+</section>
+<div class="foot">Color Play Free Demo · No deposits · No withdrawals · No cash prizes</div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+/* Firebase project configuration supplied by you */
+var firebaseConfig = {
+  apiKey: "BIzaSyDO9RoLM6ZtJXiwNIG0c9soZEsSDOUh6pc",
+  authDomain: "global-98f25.firebaseapp.com",
+  databaseURL: "https://global-98f25-default-rtdb.firebaseio.com",
+  projectId: "global-98f25",
+  storageBucket: "global-98f25.firebasestorage.app",
+  messagingSenderId: "18868844294",
+  appId: "1:18868844294:web:416125c6e19f1f5dcc9087"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.database();
+
+var seconds = 30, roundNo = 1, selected = null, locked = false;
+var correct = 0, played = 0, history = [], currentUser = null;
+var timerEl = document.getElementById('timer');
+var statusEl = document.getElementById('status');
+var buttons = Array.from(document.querySelectorAll('.choice'));
+
+function paintStats(){
+  document.getElementById('correct').textContent = correct;
+  document.getElementById('played').textContent = played;
+  document.getElementById('accuracy').textContent = played ? Math.round(correct/played*100)+'%' : '0%';
+}
+function saveScore(){
+  if(!currentUser) return;
+  db.ref('demoScores/'+currentUser.uid).update({
+    email: currentUser.email || '',
+    correct: correct, played: played,
+    updatedAt: firebase.database.ServerValue.TIMESTAMP
+  }).catch(function(e){ document.getElementById('authMsg').textContent=': '+e.message; });
+}
+function renderHistory(){
+  var el=document.getElementById('history'); el.innerHTML='';
+  if(!history.length){el.innerHTML='<div class="small">अभी कोई राउंड पूरा नहीं हुआ।</div>';return;}
+  history.slice().reverse().forEach(function(item){
+    var row=document.createElement('div');row.className='historyrow';
+    var left=document.createElement('span');left.textContent='Round #'+item.round;
+    var right=document.createElement('span');
+    var dot=document.createElement('i');dot.className='dot '+item.color.toLowerCase();
+    right.appendChild(dot);right.appendChild(document.createTextNode(item.color+(item.won?' · सही':' · गलत')));
+    row.appendChild(left);row.appendChild(right);el.appendChild(row);
+  });
+}
+function choose(color){
+  if(locked || seconds<=0) return;
+  selected=color;
+  buttons.forEach(function(b){b.classList.toggle('selected',b.dataset.color===color);});
+  statusEl.textContent='आपने '+color+' चुना है। राउंड के अंत में परिणाम दिखेगा।';
+}
+buttons.forEach(function(b){b.addEventListener('click',function(){choose(b.dataset.color);});});
+deposited8279759769@ptyes
+function finishRound(){
+  locked=true;
+  var colors=['Red','Green','Violet'];
+  var result=colors[Math.floor(Math.random()*colors.length)];
+  var won=!!selected && selected===result;
+  played++;
+  if(won) correct++;
+  history.push({round:roundNo,color:result,won:won});
+  if(history.length>8) history.shift();
+  statusEl.textContent='राउंड #'+roundNo+' का परिणाम: '+result+'. '+(selected?(won?'सही अनुमान!':'इस बार अनुमान सही नहीं था।'):'आपने कोई रंग नहीं चुना।');
+  paintStats();renderHistory();saveScore();
+  setTimeout(function(){
+    roundNo++;seconds=30;selected=null;locked=false;
+    buttons.forEach(function(b){b.classList.remove('selected');});
+    document.getElementById('roundLabel').textContent='Round #'+roundNo;
+    statusEl.textContent='नया राउंड शुरू हो गया है। एक रंग चुनें।';
+  },2600);
+}
+setInterval(function(){
+  if(locked)return;
+  seconds--;timerEl.textContent=seconds;
+  if(seconds<=0){timerEl.textContent='0';finishRound();}
+},1000);
+
+document.getElementById('signup').addEventListener('click',function(){
+  var email=document.getElementById('email').value.trim(), pass=document.getElementById('password').value;
+  if(!email||pass.length<6){document.getElementById('authMsg').textContent='ईमेल भरें और कम से कम 6 अक्षर का पासवर्ड डालें।';return;}
+  auth.createUserWithEmailAndPassword(email,pass).then(function(cred){
+    return cred.user.sendEmailVerification().then(function(){
+      document.getElementById('authMsg').textContent='अकाउंट बन गया। कृपया अपना ईमेल verify करें।';
+    });
+  }).catch(function(e){document.getElementById('authMsg').textContent=e.message;});
+});
+document.getElementById('login').addEventListener('click',function(){
+  var email=document.getElementById('email').value.trim(), pass=document.getElementById('password').value;
+  auth.signInWithEmailAndPassword(email,pass).catch(function(e){document.getElementById('authMsg').textContent=e.message;});
+});
+document.getElementById('logout').addEventListener('click',function(){auth.signOut();});
+auth.onAuthStateChanged(function(user){
+  currentUser=user;
+  document.getElementById('logout').style.display=user?'inline-block':'none';
+  document.getElementById('login').style.display=user?'none':'inline-block';
+  document.getElementById('signup').style.display=user?'none':'inline-block';
+  document.getElementById('authMsg').textContent=user?'लॉगिन: '+user.email+(user.emailVerified?' · verified':' · email verify करें'):'आप अभी guest mode में हैं।';
+  if(user){
+    db.ref('demoScores/'+user.uid).once('value').then(function(s){
+      var v=s.val(); if(v){correct=Number(v.correct)||0;played=Number(v.played)||0;paintStats();}
+    }).catch(function(e){document.getElementById('authMsg').textContent='Database error: '+e.message;});
+  }
+});
+</script>
+</body>
+</html>
